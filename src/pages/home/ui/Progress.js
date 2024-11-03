@@ -1,57 +1,39 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import CircularProgress from '@mui/material/CircularProgress';
+import LinearProgress from '@mui/material/LinearProgress';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import {useUnit} from "effector-react";
+import {$storeScoreBank, bankMax} from "../../../entities/game";
 
-function CircularProgressWithLabel(props) {
+function LinearProgressWithLabel(props) {
+    const progress = Math.round(bankMax - $storeScoreBank.getState())
     return (
-        <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-            <CircularProgress variant="determinate" {...props} />
-            <Box
-                sx={{
-                    top: 0,
-                    left: 0,
-                    bottom: 0,
-                    right: 0,
-                    position: 'absolute',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                }}
-            >
-                <Typography
-                    variant="caption"
-                    component="div"
-                    sx={{ color: 'text.secondary' }}
-                >
-                    {`${Math.round(props.value)}%`}
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Box sx={{ width: '100%', mr: 1 }}>
+                <LinearProgress variant="determinate" {...props} />
+            </Box>
+            <Box sx={{ minWidth: 35 }}>
+                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                    {`${progress >= 0 ? progress : 0}`}
                 </Typography>
             </Box>
         </Box>
     );
 }
 
-CircularProgressWithLabel.propTypes = {
+LinearProgressWithLabel.propTypes = {
     /**
-     * The value of the progress indicator for the determinate variant.
+     * The value of the progress indicator for the determinate and buffer variants.
      * Value between 0 and 100.
-     * @default 0
      */
     value: PropTypes.number.isRequired,
 };
 
+
 export default function Progress() {
-    const [progress, setProgress] = React.useState(10);
+    const count = useUnit($storeScoreBank)
 
-    React.useEffect(() => {
-        const timer = setInterval(() => {
-            setProgress((prevProgress) => (prevProgress >= 100 ? 0 : prevProgress + 10));
-        }, 800);
-        return () => {
-            clearInterval(timer);
-        };
-    }, []);
-
-    return <CircularProgressWithLabel value={progress} />;
+    return <LinearProgressWithLabel value={count / bankMax * 100 > 100 ? 100 : count / bankMax * 100}
+                                    color="success" size="30%"/>
 }

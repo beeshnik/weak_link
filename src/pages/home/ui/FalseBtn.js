@@ -13,7 +13,7 @@ export default function FalseBtn() {
             color={"error"}
             disabled={!isClickable}
         >
-            No
+            Wrong Answer
         </Button>
     )
 }

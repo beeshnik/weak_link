@@ -8,7 +8,7 @@ export const bankMax = getRandomInt() * 10
 /**
  * Время на вопрос
  * */
-const timeToQuestion = 30000
+export const timeToQuestion = 30000
 
 /**
  * Добавить баллы в банк

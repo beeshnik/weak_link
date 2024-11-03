@@ -13,7 +13,7 @@ export default function TrueBtn() {
             color="success"
             disabled={!isClickable}
         >
-            Yes
+            True answer
         </Button>
     )
 }
