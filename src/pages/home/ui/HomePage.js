@@ -6,6 +6,8 @@ import FalseBtn from "./FalseBtn";
 import Bank from "./Bank";
 import GameTimer from "./GameTimer";
 import {eventStartGame} from "../../../entities/game"
+import Question from "./Question";
+import Finish from "./Finish";
 
 export default function HomePage(){
     React.useEffect(() => {
@@ -15,7 +17,14 @@ export default function HomePage(){
         <div>
             <Container fixed>
                 <Box>
-                    <h1>Question</h1>
+                    <Grid container spacing={1}>
+                        <Grid size={1}>
+                            <Question/>
+                        </Grid>
+                        <Grid size={1}>
+                            <GameTimer/>
+                        </Grid>
+                    </Grid>
                 </Box>
                 <Box>
                     <Grid container spacing={1}>
@@ -29,7 +38,7 @@ export default function HomePage(){
                             <Bank/>
                         </Grid>
                         <Grid size={1}>
-                            <GameTimer/>
+                            <Finish/>
                         </Grid>
                     </Grid>
                 </Box>

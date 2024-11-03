@@ -3,14 +3,12 @@ import {createEffect, createEvent, createStore, sample} from "effector";
 /**
  * Максимум баллов в банке
  */
-export const bankMax = getRandomInt()
+export const bankMax = getRandomInt() * 10
 
 /**
  * Время на вопрос
  * */
-const timeToQuestion = 3000
-
-let timerId
+const timeToQuestion = 30000
 
 /**
  * Добавить баллы в банк
@@ -45,6 +43,13 @@ const eventStopTimer = createEvent()
  * */
 const eventTimeOver = createEvent()
 
+const eventStartTimer = createEvent()
+
+const eventDelSec = createEvent()
+
+const eventSetTimerId = createEvent()
+const eventSetClockId = createEvent()
+
 /**
  * Количество баллов в банке
  * */
@@ -62,7 +67,16 @@ export const $storeQuestionPrice = createStore(0)
 export const $storeIsClickable = createStore(false)
     .on(eventSetClickable, (state, value) => value)
 
-const $storeTimer = createStore(0)
+export const $storeTimer = createStore(timeToQuestion)
+    .on(eventDelSec, (state) => state - 1000)
+    .reset(eventStartTimer)
+
+export const $timerId = createStore({
+    timerId: 0,
+    clockId: 0
+})
+    .on(eventSetTimerId, (state, value) => ({...state, timerId: value}))
+    .on(eventSetClockId, (state, value) => ({...state, clockId: value}))
 
 /**
  * Получить вопрос
@@ -79,26 +93,35 @@ const getQuestionFx = createEffect(async () => {
  * Запуск таймера на вопрос
  * */
 const startTimerFx = createEffect(async () => {
-    const promise = new Promise((resolve, reject) => {
-        timerId = setTimeout(() => {
+    eventSetTimerId(
+        setTimeout(() => {
+            eventStopTimer()
             eventTimeOver()
-            resolve()
         }, timeToQuestion)
-    });
-    await promise;
+    )
 })
+
+const setClockFx = createEffect( () => {
+    eventSetClockId(
+        setInterval(() => {
+            eventDelSec()
+        }, 1000)
+    )
+})
+
 /**
  * Остановка таймера на вопрос
  * */
-const stopTimerFx = createEffect( (timerId) => {
-    clearTimeout(timerId)
+const stopTimerFx = createEffect( (clock) => {
+    clearTimeout(clock.timerId)
+    clearInterval(clock.clockId)
 })
 /**
  * Проверка ответа на вопрос
  * */
 const validateAnswerFx = createEffect( async (answer) => {
     const promise = new Promise((resolve, reject) => {
-        eventStopTimer(timerId)
+        eventStopTimer()
         eventSetClickable(false)
         answer === "yes" ? eventScorePlus($storeQuestionPrice.getState()) : eventScoreReset()
         resolve()
@@ -117,6 +140,7 @@ const timeOverFx = createEffect(async () => {
     await promise;
 })
 
+
 /**
  * Старт игры
  * */
@@ -130,7 +154,7 @@ sample({
  * */
 sample({
     clock: getQuestionFx.done,
-    target: startTimerFx,
+    target: eventStartTimer,
 })
 
 /**
@@ -141,15 +165,12 @@ sample({
     target: validateAnswerFx
 })
 
-sample({
-
-})
-
 /**
  * Остановка таймера
  * */
 sample({
     clock: eventStopTimer,
+    source: $timerId,
     target: stopTimerFx
 })
 
@@ -177,13 +198,21 @@ sample({
     target: getQuestionFx,
 })
 
+sample({
+    clock: eventStartTimer,
+    target: [startTimerFx, setClockFx]
+})
+
 /**
  * Получить рандомное число в диапазоне от 2 до 2^7
  * */
 function getRandomInt(){
-    return Math.floor(Math.random() * (2^7 - 2 + 1) + 2);
+    return Math.floor(Math.random() * (Math.pow(2, 7) - 2 + 1) + 2);
 }
 
+/**
+ * Получить новый вопрос
+ * */
 function getNewQuestion() {
     eventNextQuestion(getRandomInt())
     eventSetClickable(true)
