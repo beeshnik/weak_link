@@ -27,8 +27,12 @@ export default function HomePage(){
                             height: '100%',
                             display: "flex",
                             alignItems: "center",
-                            justifyContent: "center"
+                            justifyContent: "center",
+                            backgroundColor: '#bedd9a',
+                            borderRadius: 5,
+                            padding: "10px",
                         }}>
+                            Осталось времени
                             <GameTimer/>
                         </Grid>
                         <Grid size={6}  sx={{
@@ -38,14 +42,17 @@ export default function HomePage(){
                             justifyContent: "center"
                         }}>
                             <h1>
-                                ???
+                                Вопрос
                             </h1>
                         </Grid>
                         <Grid size={3}  sx={{
                             height: '100%',
                             display: "flex",
                             alignItems: "center",
-                            justifyContent: "center"
+                            justifyContent: "center",
+                            backgroundColor: '#bedd9a',
+                            borderRadius: 5,
+                            padding: "10px",
                         }}>
                             <Grid container spacing={2} sx={{
                                 height: '100%',
@@ -54,30 +61,24 @@ export default function HomePage(){
                                 <Grid size={12}>
                                     <Box sx={{
                                         height: '100%',
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center"
                                     }}>
+                                        Стоимость вопроса
                                         <Question/>
                                     </Box>
                                 </Grid>
                                 <Grid size={12}>
                                     <Box sx={{
                                         height: '100%',
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center"
                                     }}>
+                                        Сумма набранных очков
                                         <Bank/>
                                     </Box>
                                 </Grid>
                                 <Grid size={12}>
                                     <Box sx={{
                                         height: '100%',
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center"
                                     }}>
+                                        Требуемое количество очков
                                         <Finish/>
                                     </Box>
                                 </Grid>
@@ -137,9 +138,9 @@ export default function HomePage(){
                             height: '100%',
                             width: '100%',
                         }}>
+                            Прогресс
                             <Progress/>
                         </Box>
-
                     </Box>
                 </Box>
             </Container>

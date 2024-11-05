@@ -42,13 +42,23 @@ const eventStopTimer = createEvent()
  * Время вышло
  * */
 const eventTimeOver = createEvent()
-
+/**
+ * Установить таймер
+ * */
 const eventStartTimer = createEvent()
-
+/**
+ * Вычесть время из таймера
+ * */
 const eventDelSec = createEvent()
-
+/**
+ * Установить ID игрового таймера
+ * */
 const eventSetTimerId = createEvent()
+/**
+ * Установить ID таймера UI
+ * */
 const eventSetClockId = createEvent()
+
 
 /**
  * Количество баллов в банке
@@ -66,17 +76,22 @@ export const $storeQuestionPrice = createStore(0)
  * */
 export const $storeIsClickable = createStore(false)
     .on(eventSetClickable, (state, value) => value)
-
+/**
+ * Время на таймере UI
+ * */
 export const $storeTimer = createStore(timeToQuestion)
     .on(eventDelSec, (state) => state - 1000)
     .reset(eventStartTimer)
-
+/**
+ * ID таймеров
+ * */
 export const $timerId = createStore({
     timerId: 0,
     clockId: 0
 })
     .on(eventSetTimerId, (state, value) => ({...state, timerId: value}))
     .on(eventSetClockId, (state, value) => ({...state, clockId: value}))
+
 
 /**
  * Получить вопрос
@@ -88,7 +103,6 @@ const getQuestionFx = createEffect(async () => {
     });
     await promise;
 })
-
 /**
  * Запуск таймера на вопрос
  * */
@@ -100,7 +114,9 @@ const startTimerFx = createEffect(async () => {
         }, timeToQuestion)
     )
 })
-
+/**
+ * Установить таймер в UI
+ * */
 const setClockFx = createEffect( () => {
     eventSetClockId(
         setInterval(() => {
@@ -108,7 +124,6 @@ const setClockFx = createEffect( () => {
         }, 1000)
     )
 })
-
 /**
  * Остановка таймера на вопрос
  * */
@@ -128,7 +143,6 @@ const validateAnswerFx = createEffect( async (answer) => {
     });
     await promise;
 })
-
 /**
  * Обработка окончания времени
  * */
@@ -148,7 +162,6 @@ sample({
     clock: eventStartGame,
     target: getQuestionFx,
 })
-
 /**
  * Вопрос получен => запуск таймера
  * */
@@ -156,7 +169,6 @@ sample({
     clock: getQuestionFx.done,
     target: eventStartTimer,
 })
-
 /**
  * Ответ получен
  * */
@@ -164,7 +176,6 @@ sample({
     clock: eventGetAnswer,
     target: validateAnswerFx
 })
-
 /**
  * Остановка таймера
  * */
@@ -173,7 +184,6 @@ sample({
     source: $timerId,
     target: stopTimerFx
 })
-
 /**
  * Время на вопрос вышло
  * */
@@ -181,7 +191,6 @@ sample({
     clock: eventTimeOver,
     target: timeOverFx
 })
-
 /**
  * Ответ провалидирован => получение следующего вопроса
  * */
@@ -189,7 +198,6 @@ sample({
     clock: validateAnswerFx.done,
     target: getQuestionFx,
 })
-
 /**
  * Выход времени обработан => получение следующего вопроса
  * */
@@ -197,11 +205,11 @@ sample({
     clock: timeOverFx.done,
     target: getQuestionFx,
 })
-
 sample({
     clock: eventStartTimer,
     target: [startTimerFx, setClockFx]
 })
+
 
 /**
  * Получить рандомное число в диапазоне от 2 до 2^7
@@ -209,7 +217,6 @@ sample({
 function getRandomInt(){
     return Math.floor(Math.random() * (Math.pow(2, 7) - 2 + 1) + 2);
 }
-
 /**
  * Получить новый вопрос
  * */
