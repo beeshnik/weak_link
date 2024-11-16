@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import {$storeTimer, timeToQuestion} from "../../../entities/game";
-import {useUnit} from "effector-react";
+import { $storeTimer } from "../../../entities/game";
+import { useUnit } from "effector-react";
 
 
 function CircularProgressWithLabel(props) {

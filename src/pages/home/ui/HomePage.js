@@ -5,7 +5,7 @@ import TrueBtn from "./TrueBtn";
 import FalseBtn from "./FalseBtn";
 import Bank from "./Bank";
 import GameTimer from "./GameTimer";
-import {eventStartGame} from "../../../entities/game"
+import { eventStartGame } from "../../../entities/game"
 import Question from "./Question";
 import Finish from "./Finish";
 import Progress from "./Progress";
@@ -13,6 +13,10 @@ import Progress from "./Progress";
 export default function HomePage(){
     React.useEffect(() => {
         eventStartGame()
+
+        return () => {
+
+        }
     })
     return (
         <div>
