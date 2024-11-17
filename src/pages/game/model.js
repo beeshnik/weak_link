@@ -1,9 +1,12 @@
 import {createEffect, createEvent, createStore, sample} from "effector";
+import {eventScoreReset} from "./model/old";
 
 /**
  * Время раунда
  * */
 export let timeToQuestion = 30000
+
+const ScoreList = [0, 2, 4, 8, 16, 32, 64, 128]
 
 /**
  * Установить баллы в банке
@@ -65,12 +68,15 @@ const eventTimeOver = createEvent()
  * */
 const eventSetTimerId = createEvent()
 
+/**
+ * Игра окончена
+ * */
+const eventGameOver = createEvent()
 
 /**
  * Количество баллов в банке
  * */
 export const $storeBank = createStore(0)
-    .on(eventInBank, (state, value) => state + value)
 
 /**
  * ID таймера
@@ -80,8 +86,8 @@ const $timerId = createStore(null)
 /**
  * Текущее количество заработанных баллов
  * */
-export const $storeScore = createStore(2)
-    .on(eventUpgradeScore, (state, value) => state + value)
+export const $storeScore = createStore(0)
+    .on(eventUpgradeScore, (state) => state + 1)
     .reset(eventDowngradeScore)
 
 
@@ -91,7 +97,7 @@ export const $storeScore = createStore(2)
 const getQuestionFx = createEffect(async () => {
     const promise = new Promise((resolve, reject) => {
 
-        console.log("Ответ получен")
+        console.log("Вопрос получен")
 
         resolve()
     });
@@ -126,7 +132,7 @@ const timeOverFx = createEffect(async () => {
 const validateAnswerFx = createEffect( async (answer) => {
     const promise = new Promise((resolve, reject) => {
 
-        console.log("Ответ провалидирован")
+        answer === "yes" ? eventSuccessAnswer() : eventWrongAnswer()
 
         resolve()
     });
@@ -140,6 +146,25 @@ const stopTimerFx = createEffect( (timerId) => {
     if (timerId !== null) {
         clearTimeout(timerId)
     }
+})
+
+/**
+ * Проверка на завершение игры
+ * */
+const checkWinFx = createEffect(async () => {
+    const promise = new Promise((resolve, reject) => {
+        if ($storeScore.getState() > 7) {
+            eventInBank()
+            eventGameOver()
+        }
+        resolve()
+    });
+    await promise;
+})
+
+
+const gameOverFx = createEffect(async () => {
+    console.log("Win!")
 })
 
 
@@ -184,6 +209,45 @@ sample({
 })
 
 /**
+ * Если ответ верный
+ * */
+sample({
+    clock: eventSuccessAnswer,
+    target: eventUpgradeScore
+})
+
+/**
+ * Если ответ неверный
+ * */
+sample({
+    clock: eventWrongAnswer,
+    target: eventDowngradeScore
+})
+
+sample({
+    clock: eventInBank,
+    source: $storeScore,
+    fn: validateScoreBeforeBank,
+    target: $storeBank
+})
+
+/**
+ * Если баллы добавились в банк
+ * */
+sample({
+    clock: eventInBank,
+    target: eventDowngradeScore
+})
+
+/**
+ * Проверка на завершение игры
+ * */
+sample({
+    clock: eventSuccessAnswer,
+    target: checkWinFx
+})
+
+/**
  * Время вышло
  * */
 sample({
@@ -199,3 +263,17 @@ sample({
     source: $timerId,
     target: stopTimerFx
 })
+
+sample({
+    clock: eventGameOver,
+    target: gameOverFx
+})
+
+function validateScoreBeforeBank(value){
+    if (value > 7){
+        return $storeBank.getState() + ScoreList[7]
+    }
+    else{
+        return $storeBank.getState() + ScoreList[value]
+    }
+}
