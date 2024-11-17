@@ -1,7 +1,7 @@
-import HomePage from "../pages/home/ui/HomePage";
+import GamePage from "../pages/game/";
 import React from "react";
 
 export default function App() {
-  return <HomePage/>
+  return <GamePage/>
 }
 
